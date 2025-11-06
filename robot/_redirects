@@ -1,0 +1,8 @@
+# Redirect root to main trader app
+/ /trader.html 200
+
+# Handle the trader file without extension
+/trader /trader.html 200
+
+# Handle all other routes to main app (SPA behavior)
+/* /trader.html 200

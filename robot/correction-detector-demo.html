@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Correction Detector - Demo</title>
+    
+    <!-- Load dependencies -->
+    <script src="js/config.js"></script>
+    <script src="js/auth-manager.js"></script>
+    <script src="js/http-client.js"></script>
+    <script src="js/models/recommendation-models.js"></script>
+    <script src="js/api/api-endpoints.js"></script>
+    <script src="js/api-integration.js"></script>
+    <script src="js/market-correction-detector.js"></script>
+    
+    <style>
+        :root {
+            --primary-yellow: #FFD700;
+            --primary-green: #00FF41;
+            --card-black: #1a1a1a;
+            --bg-dark: #0a0a0a;
+            --text-white: #ffffff;
+            --danger: #FF4444;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: var(--bg-dark);
+            color: var(--text-white);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: var(--primary-yellow);
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 36px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #aaa;
+            margin-bottom: 30px;
+        }
+        
+        .section {
+            background: var(--card-black);
+            border: 2px solid var(--primary-yellow);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        
+        .section h2 {
+            color: var(--primary-yellow);
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid var(--primary-yellow);
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        .stat-label {
+            color: #aaa;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            color: var(--primary-yellow);
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .market-state {
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 18px;
+            margin: 10px 0;
+        }
+        
+        .state-correction { background: #FF4444; color: #000; }
+        .state-recovery { background: #00FF41; color: #000; }
+        .state-bullish { background: #00FF41; color: #000; }
+        .state-bearish { background: #FF8800; color: #000; }
+        .state-neutral { background: #888; color: #000; }
+        
+        button {
+            background: var(--primary-yellow);
+            color: var(--card-black);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        
+        button:hover {
+            opacity: 0.9;
+        }
+        
+        button:active {
+            transform: scale(0.98);
+        }
+        
+        .indicator-bar {
+            background: rgba(255, 255, 255, 0.1);
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        
+        .indicator-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--danger), var(--primary-yellow), var(--primary-green));
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-weight: 700;
+            font-size: 12px;
+        }
+        
+        #log {
+            background: #000;
+            border: 1px solid var(--primary-yellow);
+            border-radius: 5px;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid var(--primary-yellow);
+            padding-left: 10px;
+        }
+        
+        .warning {
+            background: rgba(255, 136, 0, 0.1);
+            border: 1px solid #FF8800;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            color: #FF8800;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Market Correction Detector</h1>
+        <p class="subtitle">Real-time market analysis with automatic PUT/CALL recommendations</p>
+        
+        <div class="section">
+            <h2>📊 Current Market State</h2>
+            <div id="market-state-display">
+                <span class="market-state state-neutral">INITIALIZING...</span>
+            </div>
+            <p style="margin-top: 15px; color: #aaa;">
+                The system analyzes 10+ technical indicators every 5 minutes to detect corrections and recoveries.
+            </p>
+        </div>
+        
+        <div class="section">
+            <h2>📈 Technical Indicators</h2>
+            <div class="grid">
+                <div class="stat-card">
+                    <div class="stat-label">Price Change</div>
+                    <div class="stat-value" id="price-change">--</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">RSI (14)</div>
+                    <div class="stat-value" id="rsi">--</div>
+                    <div class="indicator-bar">
+                        <div class="indicator-fill" id="rsi-bar" style="width: 50%">50</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">VIX (Fear Index)</div>
+                    <div class="stat-value" id="vix">--</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">MACD Trend</div>
+                    <div class="stat-value" id="macd">--</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Put/Call Ratio</div>
+                    <div class="stat-value" id="put-call">--</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">News Sentiment</div>
+                    <div class="stat-value" id="sentiment">--</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>🎯 Actions</h2>
+            <button onclick="forceAnalysis()">🔄 Force Analysis Now</button>
+            <button onclick="simulateCorrection()">🔻 Simulate Correction</button>
+            <button onclick="simulateRecovery()">📈 Simulate Recovery</button>
+            <button onclick="viewCurrentState()">📊 View Current State</button>
+            <button onclick="clearLog()">🗑️ Clear Log</button>
+        </div>
+        
+        <div class="warning">
+            ⚠️ <strong>Demo Mode:</strong> This page uses simulated market data for demonstration. 
+            In production, it connects to real market data APIs.
+        </div>
+        
+        <div class="section">
+            <h2>📝 Activity Log</h2>
+            <div id="log"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Log function
+        function addLog(message, type = 'info') {
+            const log = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.style.borderLeftColor = type === 'error' ? '#FF4444' : 
+                                         type === 'success' ? '#00FF41' : 
+                                         '#FFD700';
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            log.insertBefore(entry, log.firstChild);
+            
+            // Keep only last 50 entries
+            while (log.children.length > 50) {
+                log.removeChild(log.lastChild);
+            }
+        }
+        
+        // Update display
+        function updateDisplay() {
+            const state = marketCorrectionDetector.getMarketState();
+            
+            // Update market state
+            const stateDisplay = document.getElementById('market-state-display');
+            const stateClass = `state-${state.state.replace('_', '-')}`;
+            stateDisplay.innerHTML = `<span class="market-state ${stateClass}">${state.state.toUpperCase().replace('_', ' ')}</span>`;
+            
+            // Update indicators
+            if (state.indicators.priceChange !== undefined) {
+                document.getElementById('price-change').textContent = 
+                    (state.indicators.priceChange * 100).toFixed(2) + '%';
+                document.getElementById('price-change').style.color = 
+                    state.indicators.priceChange >= 0 ? '#00FF41' : '#FF4444';
+            }
+            
+            if (state.indicators.rsi !== undefined) {
+                const rsi = state.indicators.rsi.toFixed(1);
+                document.getElementById('rsi').textContent = rsi;
+                document.getElementById('rsi-bar').style.width = rsi + '%';
+                document.getElementById('rsi-bar').textContent = rsi;
+                document.getElementById('rsi').style.color = 
+                    rsi < 30 ? '#00FF41' : rsi > 70 ? '#FF4444' : '#FFD700';
+            }
+            
+            if (state.indicators.vix !== undefined) {
+                const vix = state.indicators.vix.toFixed(1);
+                document.getElementById('vix').textContent = vix;
+                document.getElementById('vix').style.color = 
+                    vix > 30 ? '#FF4444' : vix > 20 ? '#FF8800' : '#00FF41';
+            }
+            
+            if (state.indicators.macd) {
+                document.getElementById('macd').textContent = state.indicators.macd.trend.toUpperCase();
+                document.getElementById('macd').style.color = 
+                    state.indicators.macd.trend === 'bullish' ? '#00FF41' : '#FF4444';
+            }
+            
+            if (state.indicators.putCallRatio !== undefined) {
+                document.getElementById('put-call').textContent = state.indicators.putCallRatio.toFixed(2);
+            }
+            
+            if (state.sentimentScore !== undefined) {
+                const sentiment = state.sentimentScore.toFixed(2);
+                document.getElementById('sentiment').textContent = sentiment;
+                document.getElementById('sentiment').style.color = 
+                    sentiment > 0 ? '#00FF41' : sentiment < 0 ? '#FF4444' : '#FFD700';
+            }
+        }
+        
+        // Force analysis
+        function forceAnalysis() {
+            addLog('Forcing market analysis...', 'info');
+            marketCorrectionDetector.analyzeMarketConditions();
+            setTimeout(updateDisplay, 1000);
+        }
+        
+        // Simulate correction
+        function simulateCorrection() {
+            addLog('Simulating market correction...', 'info');
+            // This would trigger the correction detection
+            alert('Correction simulation would modify market data to trigger correction state');
+        }
+        
+        // Simulate recovery
+        function simulateRecovery() {
+            addLog('Simulating market recovery...', 'info');
+            alert('Recovery simulation would modify market data to trigger recovery state');
+        }
+        
+        // View current state
+        function viewCurrentState() {
+            const state = marketCorrectionDetector.getMarketState();
+            console.log('Current Market State:', state);
+            addLog(`Current state: ${state.state}`, 'success');
+            alert(`Market State: ${state.state}\n\nCheck console for full details`);
+        }
+        
+        // Clear log
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+            addLog('Log cleared', 'info');
+        }
+        
+        // Listen for events
+        window.addEventListener('marketStateChange', (event) => {
+            const { previousState, newState } = event.detail;
+            addLog(`Market state changed: ${previousState} → ${newState}`, 'success');
+            updateDisplay();
+        });
+        
+        window.addEventListener('correctionRecommendations', (event) => {
+            const { category, recommendations } = event.detail;
+            addLog(`${recommendations.length} new ${category} recommendations generated`, 'success');
+        });
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            addLog('Market Correction Detector initialized', 'success');
+            addLog('System monitoring market conditions every 5 minutes', 'info');
+            addLog('Breaking news triggers immediate analysis', 'info');
+            
+            // Update display every 2 seconds
+            setInterval(updateDisplay, 2000);
+            
+            // Initial update
+            setTimeout(updateDisplay, 1000);
+        });
+    </script>
+</body>
+</html>

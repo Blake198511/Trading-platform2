@@ -1,0 +1,2328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Scanner Pro - Options, Stocks & Education Platform</title>
+    <meta name="description" content="Complete trading platform with stock predictions, options calculator, penny stock scanner, and insider trading tracker.">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-yellow: #FFD700;
+            --primary-green: #00FF41;
+            --dark-green: #00CC33;
+            --bg-black: #0A0A0A;
+            --card-black: #1A1A1A;
+            --border-color: #2A2A2A;
+            --text-white: #FFFFFF;
+            --text-gray: #B0B0B0;
+            --success: #00FF41;
+            --warning: #FFD700;
+            --danger: #FF3333;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--bg-black);
+            color: var(--text-white);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--bg-black) 0%, #1a1a1a 100%);
+            border-bottom: 3px solid var(--primary-yellow);
+            padding: 20px 0;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        h1 {
+            font-size: 2rem;
+            background: linear-gradient(135deg, var(--primary-yellow), var(--primary-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .header-subtitle {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        /* Navigation Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .tab {
+            padding: 15px 25px;
+            background: var(--card-black);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            white-space: nowrap;
+            font-size: 0.95rem;
+        }
+
+        .tab:hover {
+            border-color: var(--primary-yellow);
+            transform: translateY(-2px);
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, var(--primary-yellow), var(--dark-green));
+            color: var(--bg-black);
+            border-color: var(--primary-green);
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-black);
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--primary-yellow);
+            box-shadow: 0 6px 25px rgba(255, 215, 0, 0.2);
+        }
+
+        .card-header {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--primary-yellow);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Insider Trading Specific Styles */
+        .insider-card {
+            background: var(--card-black);
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .insider-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+
+        .insider-card.politician::before {
+            background: linear-gradient(90deg, #1E3A8A, #3B82F6);
+        }
+
+        .insider-card.hedgefund::before {
+            background: linear-gradient(90deg, #7C3AED, #A78BFA);
+        }
+
+        .insider-card.banks::before {
+            background: linear-gradient(90deg, #059669, #10B981);
+        }
+
+        .insider-card.insiders::before {
+            background: linear-gradient(90deg, #DC2626, #F87171);
+        }
+
+        .insider-card:hover {
+            border-color: var(--primary-yellow);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(255, 215, 0, 0.2);
+        }
+
+        .insider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 20px;
+        }
+
+        .insider-name {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary-yellow);
+        }
+
+        .insider-role {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        .trade-badge {
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 800;
+            font-size: 1rem;
+        }
+
+        .trade-badge.buy {
+            background: rgba(0, 255, 65, 0.2);
+            color: var(--primary-green);
+            border: 2px solid var(--primary-green);
+        }
+
+        .trade-badge.sell {
+            background: rgba(255, 51, 51, 0.2);
+            color: var(--danger);
+            border: 2px solid var(--danger);
+        }
+
+        .trade-details {
+            background: var(--bg-black);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: var(--text-gray);
+        }
+
+        .detail-value {
+            color: var(--text-white);
+            font-weight: 700;
+        }
+
+        .confidence-score {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(0, 255, 65, 0.05);
+            border-radius: 10px;
+        }
+
+        .score-label {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+        }
+
+        .score-bar {
+            flex: 1;
+            height: 12px;
+            background: var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .score-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-green), var(--primary-yellow));
+            transition: width 0.5s ease;
+        }
+
+        .score-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary-green);
+        }
+
+        .insider-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-box {
+            background: var(--bg-black);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid var(--border-color);
+        }
+
+        .stat-label {
+            color: var(--text-gray);
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--primary-yellow);
+        }
+
+        .why-follow {
+            background: rgba(255, 215, 0, 0.1);
+            border-left: 4px solid var(--primary-yellow);
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .why-title {
+            font-weight: 700;
+            color: var(--primary-yellow);
+            margin-bottom: 10px;
+        }
+
+        .filter-chips {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .filter-chip {
+            padding: 10px 20px;
+            background: var(--bg-black);
+            border: 2px solid var(--border-color);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .filter-chip:hover {
+            border-color: var(--primary-yellow);
+        }
+
+        .filter-chip.active {
+            background: linear-gradient(135deg, var(--primary-yellow), var(--dark-green));
+            color: var(--bg-black);
+            border-color: var(--primary-green);
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--primary-green);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            background: var(--bg-black);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-white);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-yellow);
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.1);
+        }
+
+        input::placeholder {
+            color: var(--text-gray);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-yellow), var(--dark-green));
+            color: var(--bg-black);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--bg-black);
+            color: var(--primary-green);
+            border: 2px solid var(--primary-green);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-green);
+            color: var(--bg-black);
+        }
+
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 0.85rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        /* Warning Banner */
+        .warning-banner {
+            background: rgba(255, 215, 0, 0.1);
+            border: 2px solid var(--primary-yellow);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .warning-banner h3 {
+            color: var(--primary-yellow);
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+
+        .warning-banner ul {
+            list-style: none;
+            color: var(--text-gray);
+            font-size: 0.9rem;
+        }
+
+        .warning-banner li {
+            padding: 5px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .warning-banner li::before {
+            content: '⚠️';
+            position: absolute;
+            left: 0;
+        }
+
+        /* Loading Animation */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-gray);
+        }
+
+        .spinner {
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary-yellow);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Tip Boxes */
+        .tip-box {
+            background: rgba(255, 215, 0, 0.1);
+            border-left: 4px solid var(--primary-yellow);
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin: 15px 0;
+        }
+
+        .tip-box.success {
+            background: rgba(0, 255, 65, 0.1);
+            border-left-color: var(--primary-green);
+        }
+
+        .tip-box.danger {
+            background: rgba(255, 51, 51, 0.1);
+            border-left-color: var(--danger);
+        }
+
+        .tip-title {
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Results Display */
+        .results {
+            margin-top: 30px;
+        }
+
+        .result-item {
+            background: var(--bg-black);
+            border: 2px solid var(--border-color);
+            border-left: 4px solid var(--primary-green);
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .result-item:hover {
+            border-left-color: var(--primary-yellow);
+            transform: translateX(5px);
+        }
+
+        .result-label {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .result-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary-yellow);
+        }
+
+        .profit-positive {
+            color: var(--success);
+        }
+
+        .profit-negative {
+            color: var(--danger);
+        }
+
+        /* Summary Box */
+        .summary-box {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(0, 255, 65, 0.1));
+            border: 2px solid var(--primary-green);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+
+        .summary-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary-yellow);
+            margin-bottom: 15px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .summary-item {
+            text-align: center;
+        }
+
+        .summary-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-green);
+        }
+
+        .summary-label {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--card-black);
+            border-top: 2px solid var(--border-color);
+            padding: 30px 0;
+            margin-top: 50px;
+            text-align: center;
+        }
+
+        footer p {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            margin: 10px 0;
+        }
+
+        .footer-disclaimer {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+        }
+
+        .footer-disclaimer h4 {
+            color: var(--primary-yellow);
+            margin-bottom: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .tabs {
+                flex-wrap: wrap;
+            }
+            
+            .tab {
+                flex: 1 1 calc(50% - 10px);
+                min-width: 150px;
+            }
+            
+            .insider-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+
+        /* Stock Scanner Specific Styles */
+        .scanner-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .scanner-input input {
+            flex: 1;
+        }
+
+        .stock-result {
+            background: var(--card-black);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .stock-result:hover {
+            border-color: var(--primary-yellow);
+            transform: translateY(-2px);
+        }
+
+        .stock-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .stock-symbol {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary-yellow);
+        }
+
+        .stock-price {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .price-change {
+            font-size: 0.9rem;
+            margin-left: 10px;
+        }
+
+        .catalyst-tag {
+            display: inline-block;
+            padding: 5px 12px;
+            background: rgba(255, 215, 0, 0.2);
+            border: 1px solid var(--primary-yellow);
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin: 5px 5px 5px 0;
+        }
+
+        .probability-meter {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .probability-bar {
+            flex: 1;
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .probability-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--danger), var(--primary-yellow), var(--primary-green));
+            transition: width 0.5s ease;
+        }
+
+        /* News Analysis Specific Styles */
+        .breaking-news {
+            border-left: 4px solid var(--danger) !important;
+            animation: pulse 2s infinite;
+        }
+
+        .breaking-banner {
+            background: linear-gradient(90deg, var(--danger), #FF6666);
+            color: white;
+            padding: 8px 15px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin: -25px -25px 20px -25px;
+            text-align: center;
+        }
+
+        .overdue-catalyst {
+            border-left: 4px solid var(--warning) !important;
+        }
+
+        .overdue-banner {
+            background: linear-gradient(90deg, var(--warning), #FFE066);
+            color: var(--bg-black);
+            padding: 8px 15px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin: -25px -25px 20px -25px;
+            text-align: center;
+        }
+
+        .news-headline {
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .news-headline:hover {
+            color: var(--primary-green) !important;
+        }
+
+        .sentiment-positive {
+            color: var(--primary-green);
+        }
+
+        .sentiment-negative {
+            color: var(--danger);
+        }
+
+        .sentiment-neutral {
+            color: var(--text-gray);
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 51, 51, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 51, 51, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 51, 51, 0); }
+        }
+
+        /* Catalyst Event Styles */
+        .catalyst-countdown {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--primary-yellow);
+            border-radius: 8px;
+            padding: 10px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .countdown-timer {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary-yellow);
+        }
+
+        .risk-meter {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .risk-bar {
+            flex: 1;
+            height: 8px;
+            background: var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .risk-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+
+        .risk-low .risk-fill {
+            background: var(--primary-green);
+        }
+
+        .risk-medium .risk-fill {
+            background: var(--primary-yellow);
+        }
+
+        .risk-high .risk-fill {
+            background: var(--danger);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div>
+                    <h1>🚀 Trading Scanner Pro</h1>
+                    <div class="header-subtitle">Complete Trading Platform: Predictions | Calculators | Scanners | Education | Insider Tracking</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Navigation Tabs -->
+        <div class="tabs">
+            <!-- Smart Recommendation Tabs (No Duplicates) -->
+            <div class="tab active" onclick="showTab('politicians-big-investors')">🏛️ Politicians & Investors</div>
+            <div class="tab" onclick="showTab('catalyst-scanner')">⚡ Catalyst Scanner</div>
+            <div class="tab" onclick="showTab('biotech-analyzer')">🧬 Biotech Breakthrough</div>
+            <div class="tab" onclick="showTab('growth-stocks')">📈 Growth Stocks</div>
+            <div class="tab" onclick="showTab('pennystocks')">🚀 Penny Stocks</div>
+            <div class="tab" onclick="showTab('short-squeeze')">💥 Short Squeeze</div>
+            <div class="tab" onclick="showTab('ipo-analyzer')">🎯 IPO Analyzer</div>
+            <div class="tab" onclick="showTab('mergers-acquisitions')">🤝 M&A Tracker</div>
+            <div class="tab" onclick="showTab('options-recommendations')">📊 Options Strategies</div>
+            <div class="tab" onclick="showTab('crypto-infrastructure')">⛓️ Crypto Infrastructure</div>
+            <div class="tab" onclick="showTab('forex-analyzer')">💱 Forex Analyzer</div>
+            <div class="tab" onclick="showTab('news-analysis')">📰 News Analysis</div>
+            <div class="tab" onclick="showTab('calculator')">💰 Take Profit Calc</div>
+            <div class="tab" onclick="showTab('community-forum')">💬 Community Forum</div>
+        </div>
+
+        <!-- TAB 2: STOCK PREDICTIONS (OLD - KEEPING FOR NOW) -->
+        <div id="predictions" class="tab-content">
+            <div class="card">
+                <div class="card-header">🔮 AI-Powered Stock Predictions</div>
+                <p style="color: var(--text-gray); margin-bottom: 20px;">Search any stock to see price predictions, technical analysis, and trading strategies.</p>
+                
+                <div class="scanner-input">
+                    <input type="text" id="stockSymbol" placeholder="Enter stock symbol (e.g., TSLA, NVDA, AAPL)" style="text-transform: uppercase;">
+                    <button class="btn btn-primary" onclick="predictStock()">🔮 Predict</button>
+                </div>
+                
+                <div id="predictionResults"></div>
+                
+                <div class="tip-box success">
+                    <div class="tip-title">💡 Quick Tip:</div>
+                    Try searching: TSLA, GME, NVDA, AAPL, or your favorite stock!
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: NEWS & CATALYSTS -->
+        <div id="news" class="tab-content">
+            <div class="card">
+                <div class="card-header">📰 News & Government Impact Trading</div>
+                <p style="color: var(--text-gray); margin-bottom: 20px;">Find stocks moving on breaking news, government contracts, FDA decisions, and policy changes.</p>
+                
+                <button class="btn btn-primary" onclick="scanCatalysts()" style="width: 100%;">🔍 Scan Active Catalysts</button>
+                
+                <div id="catalystResults"></div>
+                
+                <div class="tip-box success">
+                    <div class="tip-title">💡 Quick Tip:</div>
+                    News creates volatility = opportunity. Act fast on time-sensitive catalysts!
+                </div>
+            </div>
+        </div>
+
+        <!-- NEW TAB: NEWS ANALYSIS -->
+        <div id="news-analysis" class="tab-content">
+            <div class="card">
+                <div class="card-header">📰 Real-Time News Analysis</div>
+                <p style="color: var(--text-gray); margin-bottom: 20px;">AI-powered analysis of breaking news with sentiment scoring and market impact predictions.</p>
+                
+                <div class="filter-chips">
+                    <div class="filter-chip active" onclick="filterNewsAnalysis('all')">All News</div>
+                    <div class="filter-chip" onclick="filterNewsAnalysis('breaking')">🚨 Breaking</div>
+                    <div class="filter-chip" onclick="filterNewsAnalysis('fda')">💊 FDA</div>
+                    <div class="filter-chip" onclick="filterNewsAnalysis('earnings')">📊 Earnings</div>
+                    <div class="filter-chip" onclick="filterNewsAnalysis('mergers')">🤝 M&A</div>
+                    <div class="filter-chip" onclick="filterNewsAnalysis('regulatory')">⚖️ Regulatory</div>
+                </div>
+                
+                <button class="btn btn-primary" onclick="scanNewsAnalysis()" style="width: 100%;">🔍 Analyze Latest News</button>
+                
+                <div id="newsAnalysisResults"></div>
+                
+                <div class="tip-box success">
+                    <div class="tip-title">💡 News Analysis Features:</div>
+                    <ul style="margin: 10px 0 0 20px; color: var(--text-gray);">
+                        <li>Real-time sentiment analysis (-1 to +1 scale)</li>
+                        <li>Market impact scoring (1-10 scale)</li>
+                        <li>Price movement predictions</li>
+                        <li>Affected stock symbol detection</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- NEW TAB: CATALYST EVENTS -->
+        <div id="catalyst-events" class="tab-content">
+            <div class="card">
+                <div class="card-header">⚡ Catalyst Event Tracker</div>
+                <p style="color: var(--text-gray); margin-bottom: 20px;">Track upcoming events with probability assessments and historical impact analysis.</p>
+                
+                <div class="filter-chips">
+                    <div class="filter-chip active" onclick="filterCatalystEvents('all')">All Events</div>
+                    <div class="filter-chip" onclick="filterCatalystEvents('urgent')">⏰ Urgent (7 days)</div>
+                    <div class="filter-chip" onclick="filterCatalystEvents('fda')">💊 FDA</div>
+                    <div class="filter-chip" onclick="filterCatalystEvents('earnings')">📊 Earnings</div>
+                    <div class="filter-chip" onclick="filterCatalystEvents('mergers')">🤝 M&A</div>
+                    <div class="filter-chip" onclick="filterCatalystEvents('clinical')">🧪 Clinical</div>
+                </div>
+                
+                <button class="btn btn-primary" onclick="scanCatalystEvents()" style="width: 100%;">🔍 Scan Catalyst Events</button>
+                
+                <div id="catalystEventsResults"></div>
+                
+                <div class="tip-box success">
+                    <div class="tip-title">💡 Catalyst Tracking Features:</div>
+                    <ul style="margin: 10px 0 0 20px; color: var(--text-gray);">
+                        <li>Success probability scoring (0-100%)</li>
+                        <li>Historical impact analysis</li>
+                        <li>Risk-adjusted return calculations</li>
+                        <li>Trading strategy recommendations</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: TAKE PROFIT CALCULATOR -->
+        <div id="calculator" class="tab-content">
+            <div class="card">
+                <div class="card-header">💰 Options Take Profit Calculator</div>
+                
+                <div class="form-group">
+                    <label>Entry Price (per contract)</label>
+                    <input type="number" id="entryPrice" placeholder="1.50" step="0.01" value="1.50">
+                </div>
+                
+                <div class="form-group">
+                    <label>Number of Contracts</label>
+                    <input type="number" id="numContracts" placeholder="10" value="10">
+                </div>
+                
+                <div class="form-group">
+                    <label>Contract Type</label>
+                    <select id="contractType">
+                        <option value="calls">Calls</option>
+                        <option value="puts">Puts</option>
+                    </select>
+                </div>
+                
+                <button class="btn btn-primary" onclick="calculateProfits()" style="width: 100%; margin-top: 10px;">Calculate Take Profits 🎯</button>
+                
+                <div id="calculatorResults" class="results" style="display: none;">
+                    <div class="summary-box">
+                        <div class="summary-title">💼 Position Summary</div>
+                        <div class="summary-grid">
+                            <div class="summary-item">
+                                <div class="summary-value" id="totalInvestment">$0</div>
+                                <div class="summary-label">Total Investment</div>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-value profit-positive" id="totalProfit">$0</div>
+                                <div class="summary-label">If All Targets Hit</div>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-value" id="totalReturn">0%</div>
+                                <div class="summary-label">Total Return</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card" style="margin-top: 20px;">
+                        <div class="card-header">🎯 Your Exit Strategy</div>
+                        <div id="profitTargets"></div>
+                    </div>
+                    
+                    <button class="btn btn-secondary" onclick="copyToClipboard()" style="width: 100%; margin-top: 15px;">📋 Copy Orders for Robinhood/ToS</button>
+                </div>
+            </div>
+            
+            <div class="warning-banner">
+                <h3>⚠️ Risk Management</h3>
+                <ul>
+                    <li>Options can expire worthless - never invest more than you can lose</li>
+                    <li>Set your limit orders immediately after entering position</li>
+                    <li>Consider setting a stop loss at -50% or your risk tolerance</li>
+                    <li>Works with Robinhood, Think or Swim, and Charles Schwab</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- TAB 5: PENNY STOCKS -->
+        <div id="pennystocks" class="tab-content">
+            <div class="card">
+                <div class="card-header">🚀 Penny Stocks with 10X Potential</div>
+                <p style="color: var(--text-gray); margin-bottom: 20px;">Scan for stocks under $5 with strong fundamentals, catalysts, and explosive potential.</p>
+                
+                <button class="btn btn-primary" onclick="scanPennyStocks()" style="width: 100%;">🔍 Scan Penny Stocks</button>
+                
+                <div id="pennyResults"></div>
+                
+                <div class="tip-box danger">
+                    <div class="tip-title">⚠️ High Risk Warning:</div>
+                    Penny stocks are extremely risky. Only invest 5-10% of your portfolio max.
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 6: OTC STOCKS -->
+        <div id="otc" class="tab-content">
+            <div class="card">
+                <div class="card-header">💎 OTC & Sub-Penny Stocks</div>
+                <p style="color: var(--text-gray); margin-bottom: 20px;">Find quality OTC stocks with verified financials, decreasing debt, and uplist potential.</p>
+                
+                <button class="btn btn-primary" onclick="scanOTC()" style="width: 100%;">🔍 Scan OTC Stocks</button>
+                
+                <div id="otcResults"></div>
+                
+                <div class="tip-box danger">
+                    <div class="tip-title">⚠️ Extreme Risk Warning:</div>
+                    90% of OTC stocks are scams. Only trade OTCQX and OTCQB tiers with verified financials.
+                </div>
+            </div>
+        </div>
+
+        <!-- NEW SMART RECOMMENDATION TABS -->
+
+        <!-- TAB 7: POLITICIANS & BIG INVESTORS -->
+        <div id="politicians-big-investors" class="tab-content">
+            <div class="card">
+                <div class="card-header">🏛️ Politicians & Big Investors Tracker</div>
+                <p style="color: var(--text-gray); margin-bottom: 20px;">Follow the trades of politicians like Nancy Pelosi and Dan Crenshaw, plus institutional investors like Warren Buffett and Cathie Wood.</p>
+                
+                <button class="btn btn-primary" onclick="scanPoliticiansInvestors()" style="width: 100%; margin-bottom: 20px;">🔍 Scan Latest Trades</button>
+            </div>
+            
+            <!-- Filter Container -->
+            <div id="politicians-big-investors-filter-container"></div>
+            
+            <div id="politiciansResults"></div>
+        </div>
+
+        <!-- TAB 8: CATALYST SCANNER -->
+        <div id="catalyst-scanner" class="tab-content">
+            <div class="card">
+                <div class="card-header">⚡ Catalyst Scanner</div>
+                <p style="color: var(--text-gray); margin-bottom: 20px;">Find stocks with upcoming FDA approvals, earnings surprises, government contracts, and merger announcements.</p>
+                
+                <div class="filter-chips">
+                    <div class="filter-chip active" onclick="filterCatalysts('all')">All Catalysts</div>
+                    <div class="filter-chip" onclick="filterCatalysts('fda')">💊 FDA Approvals</div>
+                    <div class="filter-chip" onclick="filterCatalysts('earnings')">📊 Earnings</div>
+                    <div class="filter-chip" onclick="filterCatalysts('mergers')">🤝 Mergers</div>
+                    <div class="filter-chip" onclick="filterCatalysts('contracts')">📋 Gov Contracts</div>
+                </div>
+                
+                <button class="btn btn-primary" onclick="scanCatalystOpportunities()" style="width: 100%;">🔍 Scan Active Catalysts</button>
+                
+                <div id="catalystScannerResults"></div>
+            </div>
+        </div>
+
+        <!-- TAB 9: BIOTECH BREAKTHROUGH ANALYZER -->
+        <div id="biotech-analyzer" class="tab-content">
+            <div class="card">
+                <div class="card-header">🧬 Biotech Breakthrough Analyzer</div>
+                <p style="color: var(--text-gray); margin-bottom: 20px;">Discover pharmaceutical companies with revolutionary treatments, drug approvals, and breakthrough therapy designations.</p>
+                
+                <div class="filter-chips">
+                    <div class="filter-chip active" onclick="filterBiotech('all')">All Biotech</div>
+                    <div class="filter-chip" onclick="filterBiotech('phase3')">🧪 Phase 3 Trials</div>
+                    <div class="filter-chip" onclick="filterBiotech('fda-review')">📋 FDA Review</div>
+                    <div class="filter-chip" onclick="filterBiotech('partnerships')">🤝 Big Pharma Partners</div>
+                </div>
+                
+                <button class="btn btn-primary" onclick="scanBiotechBreakthroughs()" style="width: 100%;">🔍 Scan Biotech Plays</button>
+                
+                <div id="biotechResults"></div>
+            </div>
+        </div>
+
+        <!-- TAB 10: GROWTH STOCKS -->
+        <div id="growth-stocks" class="tab-content">
+            <div class="card">
+                <div class="card-header">📈 Growth Stocks Analyzer</div>
+                <p style="color: var(--text-gray); margin-bottom: 20px;">Find high-growth companies with disruptive technologies, expanding markets, and competitive advantages.</p>
+                
+                <button class="btn btn-primary" onclick="scanGrowthStocks()" style="width: 100%; margin-bottom: 20px;">🔍 Scan Growth Opportunities</button>
+            </div>
+            
+            <!-- Filter Container -->
+            <div id="growth-stocks-filter-container"></div>
+            
+            <div id="growthStocksResults"></div>
+        </div>
+
+        <!-- TAB 11: OPTIONS RECOMMENDATIONS -->
+        <div id="options-recommendations" class="tab-content">
+            <div class="card">
+                <div class="card-header">📊 Options Strategy Recommendations</div>
+                <p style="color: var(--text-gray); margin-bottom: 20px;">Get call/put recommendations and complex strategies like straddles, strangles, and spreads based on market conditions.</p>
+                
+                <button class="btn btn-primary" onclick="scanOptionsRecommendations()" style="width: 100%; margin-bottom: 20px;">🔍 Scan Options Plays</button>
+            </div>
+            
+            <!-- Filter Container -->
+            <div id="options-recommendations-filter-container"></div>
+            
+            <div id="optionsResults"></div>
+        </div>
+
+        <!-- TAB 12: CRYPTO INFRASTRUCTURE -->
+        <div id="crypto-infrastructure" class="tab-content">
+            <div class="card">
+                <div class="card-header">⛓️ Crypto Infrastructure Analyzer</div>
+                <p style="color: var(--text-gray); margin-bottom: 20px;">Focus on infrastructure protocols that power the blockchain ecosystem: IoT networks, data storage, computing power, and Layer 1/2 protocols.</p>
+                
+                <button class="btn btn-primary" onclick="scanCryptoInfrastructure()" style="width: 100%; margin-bottom: 20px;">🔍 Scan Infrastructure Protocols</button>
+            </div>
+            
+            <!-- Filter Container -->
+            <div id="crypto-infrastructure-filter-container"></div>
+            
+            <div id="cryptoResults"></div>
+        </div>
+
+        <!-- TAB 13: FOREX ANALYZER -->
+        <div id="forex-analyzer" class="tab-content">
+            <div class="card">
+                <div class="card-header">💱 Forex Trading Analyzer</div>
+                <p style="color: var(--text-gray); margin-bottom: 20px;">Get currency pair recommendations based on economic events, central bank policies, and technical analysis.</p>
+                
+                <div class="filter-chips">
+                    <div class="filter-chip active" onclick="filterForex('all')">All Pairs</div>
+                    <div class="filter-chip" onclick="filterForex('major')">💰 Major Pairs</div>
+                    <div class="filter-chip" onclick="filterForex('exotic')">🌍 Exotic Pairs</div>
+                    <div class="filter-chip" onclick="filterForex('commodities')">🛢️ Commodity Currencies</div>
+                </div>
+                
+                <button class="btn btn-primary" onclick="scanForexOpportunities()" style="width: 100%;">🔍 Scan Forex Markets</button>
+                
+                <div id="forexResults"></div>
+            </div>
+        </div>
+
+        <!-- TAB 14: SHORT SQUEEZE DETECTOR -->
+        <div id="short-squeeze" class="tab-content">
+            <div class="card">
+                <div class="card-header">🚀 Short Squeeze Detector</div>
+                <p style="color: var(--text-gray); margin-bottom: 20px;">Identify stocks with high short squeeze potential based on short interest, borrowing costs, and gamma squeeze indicators.</p>
+                
+                <button class="btn btn-primary" onclick="scanShortSqueezeOpportunities()" style="width: 100%;">🔍 Scan Short Squeeze Candidates</button>
+                
+                <div id="shortSqueezeResults"></div>
+                
+                <div class="tip-box danger">
+                    <div class="tip-title">⚠️ High Risk Warning:</div>
+                    Short squeezes are extremely volatile and risky. Only use money you can afford to lose completely.
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 15: IPO ANALYZER -->
+        <div id="ipo-analyzer" class="tab-content">
+            <div class="card">
+                <div class="card-header">🎯 IPO Investment Analyzer</div>
+                <p style="color: var(--text-gray); margin-bottom: 20px;">Analyze upcoming and recent IPOs for investment potential, timing strategies, and risk factors.</p>
+                
+                <div class="filter-chips">
+                    <div class="filter-chip active" onclick="filterIPOs('all')">All IPOs</div>
+                    <div class="filter-chip" onclick="filterIPOs('upcoming')">📅 Upcoming</div>
+                    <div class="filter-chip" onclick="filterIPOs('recent')">🆕 Recent (6 months)</div>
+                    <div class="filter-chip" onclick="filterIPOs('lockup-expiring')">🔓 Lockup Expiring</div>
+                </div>
+                
+                <button class="btn btn-primary" onclick="scanIPOOpportunities()" style="width: 100%;">🔍 Scan IPO Market</button>
+                
+                <div id="ipoResults"></div>
+            </div>
+        </div>
+
+        <!-- TAB 16: MERGERS & ACQUISITIONS TRACKER -->
+        <div id="mergers-acquisitions" class="tab-content">
+            <div class="card">
+                <div class="card-header">🤝 M&A and Corporate Actions Tracker</div>
+                <p style="color: var(--text-gray); margin-bottom: 20px;">Track merger arbitrage opportunities, stock splits, spin-offs, and special dividends for event-driven trading.</p>
+                
+                <div class="filter-chips">
+                    <div class="filter-chip active" onclick="filterMA('all')">All Events</div>
+                    <div class="filter-chip" onclick="filterMA('mergers')">🤝 Mergers</div>
+                    <div class="filter-chip" onclick="filterMA('splits')">✂️ Stock Splits</div>
+                    <div class="filter-chip" onclick="filterMA('spinoffs')">🔄 Spin-offs</div>
+                    <div class="filter-chip" onclick="filterMA('dividends')">💰 Special Dividends</div>
+                </div>
+                
+                <button class="btn btn-primary" onclick="scanMergerArbitrage()" style="width: 100%;">🔍 Scan M&A Opportunities</button>
+                
+                <div id="maResults"></div>
+            </div>
+        </div>
+
+        <!-- TAB 17: COMMUNITY FORUM -->
+        <div id="community-forum" class="tab-content">
+            <div class="card">
+                <div class="card-header">💬 Community Trading Forum</div>
+                <p style="color: var(--text-gray); margin-bottom: 20px;">Share trading ideas, discuss strategies, and learn from verified traders. Moderated to prevent scams and spam.</p>
+                
+                <div class="filter-chips">
+                    <div class="filter-chip active" onclick="filterForum('all')">All Posts</div>
+                    <div class="filter-chip" onclick="filterForum('stocks')">📈 Stocks</div>
+                    <div class="filter-chip" onclick="filterForum('options')">📊 Options</div>
+                    <div class="filter-chip" onclick="filterForum('crypto')">⛓️ Crypto</div>
+                    <div class="filter-chip" onclick="filterForum('forex')">💱 Forex</div>
+                    <div class="filter-chip" onclick="filterForum('verified-only')">✅ Verified Traders Only</div>
+                </div>
+                
+                <div class="action-buttons" style="margin-bottom: 20px;">
+                    <button class="btn btn-primary" onclick="showCreatePost()">✍️ Create New Post</button>
+                    <button class="btn btn-secondary" onclick="refreshForumPosts()">🔄 Refresh Posts</button>
+                </div>
+                
+                <div id="forumResults"></div>
+                
+                <div class="tip-box success">
+                    <div class="tip-title">💡 Community Guidelines:</div>
+                    <ul style="margin: 10px 0 0 20px; color: var(--text-gray);">
+                        <li>No promotional links or pump-and-dump schemes</li>
+                        <li>Verify your trading history to get verified badge</li>
+                        <li>Share analysis, not just "buy this stock"</li>
+                        <li>Be respectful and help others learn</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-disclaimer">
+                <h4>⚠️ Legal Disclaimer</h4>
+                <p><strong>This is educational content only, NOT financial advice.</strong><br>
+                Trading stocks and options involves substantial risk of loss and is not suitable for everyone. Past performance is not indicative of future results. You can lose some or all of your investment. We are not registered investment advisors, brokers, or financial planners. Always consult with a licensed financial professional before making investment decisions.</p>
+                <p style="margin-top: 10px;"><strong>Insider trading data:</strong> Information is reported with delays and may not be current. Politician and institutional trades are disclosed based on legal requirements and may be 2-45 days old.</p>
+            </div>
+            <p>© 2024 Trading Scanner Pro. All rights reserved.</p>
+            <p style="color: var(--text-gray); font-size: 0.8rem; margin-top: 10px;">Data for educational purposes only. Verify all information independently.</p>
+        </div>
+    </footer>
+
+    <!-- Include recommendation models and smart recommendations -->
+    <script src="js/models/recommendation-models.js"></script>
+    <script src="js/api/api-endpoints.js"></script>
+    <script src="js/smart-recommendations.js"></script>
+    <script src="js/real-time-updates.js"></script>
+    
+    <!-- Include recommendation card system -->
+    <script src="js/recommendation-card-system.js"></script>
+    
+    <!-- Include filter system -->
+    <link rel="stylesheet" href="css/filter-system-styles.css">
+    <script src="js/recommendation-filter-system.js"></script>
+    
+    <!-- Include community forum system -->
+    <script src="js/content-moderation.js"></script>
+    <script src="js/user-verification-badges.js"></script>
+    <script src="js/user-verification-ui.js"></script>
+    <script src="js/community-forum-integration.js"></script>
+    
+    <script>
+        // GLOBAL VARIABLES
+        let currentInsiderFilter = 'all';
+
+        // TAB NAVIGATION
+        function showTab(tabName) {
+            const tabs = document.querySelectorAll('.tab');
+            const contents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => tab.classList.remove('active'));
+            contents.forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+
+            // Auto-load content for specific tabs
+            if (tabName === 'insiders' && document.getElementById('insiderResults').innerHTML === '') {
+                scanInsiders();
+            }
+            
+            // Auto-load content for new smart recommendation tabs
+            switch(tabName) {
+                case 'politicians-big-investors':
+                    if (document.getElementById('politiciansResults').innerHTML === '') {
+                        scanPoliticiansInvestors();
+                    }
+                    break;
+                case 'catalyst-scanner':
+                    if (document.getElementById('catalystScannerResults').innerHTML === '') {
+                        scanCatalystOpportunities();
+                    }
+                    break;
+                case 'biotech-analyzer':
+                    if (document.getElementById('biotechResults').innerHTML === '') {
+                        scanBiotechBreakthroughs();
+                    }
+                    break;
+                case 'news-analysis':
+                    if (document.getElementById('newsAnalysisResults').innerHTML === '') {
+                        scanNewsAnalysis();
+                    }
+                    break;
+                case 'catalyst-events':
+                    if (document.getElementById('catalystEventsResults').innerHTML === '') {
+                        scanCatalystEvents();
+                    }
+                    break;
+            }
+        }
+
+        // INSIDER TRADING FUNCTIONS
+        function filterInsiders(category) {
+            currentInsiderFilter = category;
+            
+            // Update active chip
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                chip.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Rescan with filter
+            scanInsiders();
+        }
+
+        function scanInsiders() {
+            const resultsDiv = document.getElementById('insiderResults');
+            resultsDiv.innerHTML = '<div class="loading"><div class="spinner"></div>Scanning insider trades...</div>';
+            
+            setTimeout(() => {
+                const allInsiders = [
+                    // POLITICIANS
+                    {
+                        name: 'Nancy Pelosi',
+                        role: 'Former Speaker of the House',
+                        category: 'politicians',
+                        ticker: 'NVDA',
+                        company: 'NVIDIA',
+                        action: 'buy',
+                        shares: 10000,
+                        value: 5000000,
+                        date: '3 days ago',
+                        price: 500.00,
+                        currentPrice: 505.48,
+                        gainPercent: 1.1,
+                        confidence: 92,
+                        winRate: 85,
+                        avgReturn: 43,
+                        why: 'Pelosi has a 85% win rate on tech stocks. Her AI chip plays historically return 40%+ within 6 months. NVDA is her largest position.',
+                        strategy: [
+                            'Follow her lead - buy on dips to $500-505',
+                            'She typically holds 3-6 months',
+                            'Her AI plays average 40% returns',
+                            'Set stop loss at $480 (-5%)',
+                            'Target: $600 (+20%)'
+                        ]
+                    },
+                    {
+                        name: 'Dan Crenshaw',
+                        role: 'U.S. Representative (TX-02)',
+                        category: 'politicians',
+                        ticker: 'LMT',
+                        company: 'Lockheed Martin',
+                        action: 'buy',
+                        shares: 5000,
+                        value: 2300000,
+                        date: '5 days ago',
+                        price: 460.00,
+                        currentPrice: 462.50,
+                        gainPercent: 0.5,
+                        confidence: 88,
+                        winRate: 78,
+                        avgReturn: 28,
+                        why: 'Crenshaw sits on Armed Services Committee with advance knowledge of defense budgets. His defense stock picks average 28% returns.',
+                        strategy: [
+                            'Defense spending increasing 15% next year',
+                            'He buys before major contract announcements',
+                            'Typically holds 6-12 months',
+                            'Target: $520 (+12%)',
+                            'Stop: $445 (-4%)'
+                        ]
+                    },
+                    // HEDGE FUNDS
+                    {
+                        name: 'Warren Buffett',
+                        role: 'Berkshire Hathaway CEO',
+                        category: 'hedgefunds',
+                        ticker: 'AAPL',
+                        company: 'Apple',
+                        action: 'buy',
+                        shares: 5000000,
+                        value: 900000000,
+                        date: '13F Filing - 14 days ago',
+                        price: 178.25,
+                        currentPrice: 178.25,
+                        gainPercent: 0,
+                        confidence: 95,
+                        winRate: 72,
+                        avgReturn: 156,
+                        why: 'Buffett increased AAPL position by 12%. His long-term holds average 156% returns. When Buffett buys, institutions follow.',
+                        strategy: [
+                            'Buffett plays are 5-10 year holds',
+                            'Accumulate on any dip below $175',
+                            'He rarely sells - ultimate conviction',
+                            'Target: $220+ (24% in 12-18 months)',
+                            'This is his largest position'
+                        ]
+                    },
+                    {
+                        name: 'Cathie Wood',
+                        role: 'ARK Invest CEO',
+                        category: 'hedgefunds',
+                        ticker: 'TSLA',
+                        company: 'Tesla',
+                        action: 'buy',
+                        shares: 50000,
+                        value: 12000000,
+                        date: '2 days ago',
+                        price: 240.00,
+                        currentPrice: 242.84,
+                        gainPercent: 1.2,
+                        confidence: 78,
+                        winRate: 58,
+                        avgReturn: 85,
+                        why: 'Cathie bought the dip aggressively. Her TSLA trades are volatile but historically return 85% when right. High risk/reward.',
+                        strategy: [
+                            'Cathie doubles down on conviction',
+                            'Her TSLA price target: $500+ (2-3 years)',
+                            'Expect 20-30% volatility',
+                            'Good entry: $235-245',
+                            'Stop: $220 support break'
+                        ]
+                    },
+                    // BIG BANKS
+                    {
+                        name: 'JPMorgan Chase',
+                        role: 'Largest U.S. Bank',
+                        category: 'banks',
+                        ticker: 'MSFT',
+                        company: 'Microsoft',
+                        action: 'buy',
+                        shares: 8000000,
+                        value: 3200000000,
+                        date: '13F Filing - 18 days ago',
+                        price: 400.00,
+                        currentPrice: 405.50,
+                        gainPercent: 1.4,
+                        confidence: 87,
+                        winRate: 71,
+                        avgReturn: 42,
+                        why: 'JPM increased MSFT by 22% - largest new position. Banks have research teams with insider access. Follow institutional money.',
+                        strategy: [
+                            'Banks buy for 2-3 year holds',
+                            'MSFT AI growth story intact',
+                            'Institutions buying = floor support',
+                            'Target: $480 (19%)',
+                            'Stop: $385 (-5%)'
+                        ]
+                    },
+                    // CORPORATE INSIDERS
+                    {
+                        name: 'Jensen Huang',
+                        role: 'NVIDIA CEO',
+                        category: 'insiders',
+                        ticker: 'NVDA',
+                        company: 'NVIDIA',
+                        action: 'buy',
+                        shares: 50000,
+                        value: 25000000,
+                        date: '7 days ago',
+                        price: 495.00,
+                        currentPrice: 505.48,
+                        gainPercent: 2.1,
+                        confidence: 94,
+                        winRate: 88,
+                        avgReturn: 67,
+                        why: 'CEO buying own stock = ultimate confidence. Jensen knows AI demand better than anyone. His buys precede major announcements.',
+                        strategy: [
+                            'CEO insider buying is strongest signal',
+                            'Jensen buying = more growth ahead',
+                            'He has perfect information',
+                            'Target: $600+ (19%)',
+                            'Stop: $480 (-5%)'
+                        ]
+                    },
+                    {
+                        name: 'Elon Musk',
+                        role: 'Tesla CEO',
+                        category: 'insiders',
+                        ticker: 'TSLA',
+                        company: 'Tesla',
+                        action: 'buy',
+                        shares: 100000,
+                        value: 24000000,
+                        date: '4 days ago',
+                        price: 240.00,
+                        currentPrice: 242.84,
+                        gainPercent: 1.2,
+                        confidence: 82,
+                        winRate: 71,
+                        avgReturn: 125,
+                        why: 'Elon buying after selling signals he believes stock bottomed. His insider buys historically precede 50%+ rallies.',
+                        strategy: [
+                            'Elon knows production numbers',
+                            'He buys before major catalysts',
+                            'Volatile but massive upside',
+                            'Target: $350+ (44%)',
+                            'Stop: $220 (-9%)'
+                        ]
+                    }
+                ];
+
+                // Filter by category
+                let filteredInsiders = currentInsiderFilter === 'all' ? 
+                    allInsiders : 
+                    allInsiders.filter(i => i.category === currentInsiderFilter);
+
+                // Generate HTML
+                let html = '';
+                filteredInsiders.forEach(insider => {
+                    const actionClass = insider.action;
+                    const categoryClass = insider.category;
+                    const gainClass = insider.gainPercent >= 0 ? 'profit-positive' : 'profit-negative';
+                    
+                    html += `
+                        <div class="insider-card ${categoryClass}">
+                            <div class="insider-header">
+                                <div>
+                                    <div class="insider-name">${insider.name}</div>
+                                    <div class="insider-role">${insider.role}</div>
+                                </div>
+                                <span class="trade-badge ${actionClass}">
+                                    ${actionClass === 'buy' ? '🟢 BOUGHT' : '🔴 SOLD'}
+                                </span>
+                            </div>
+                            
+                            <div style="margin: 20px 0;">
+                                <div style="font-size: 1.5rem; font-weight: 800; color: var(--primary-yellow);">
+                                    ${insider.ticker} - ${insider.company}
+                                </div>
+                                <div style="color: var(--text-gray); margin-top: 5px;">${insider.date}</div>
+                            </div>
+                            
+                            <div class="trade-details">
+                                <div class="detail-row">
+                                    <span class="detail-label">Shares ${actionClass === 'buy' ? 'Bought' : 'Sold'}:</span>
+                                    <span class="detail-value">${insider.shares.toLocaleString()}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Total Value:</span>
+                                    <span class="detail-value">$${(insider.value / 1000000).toFixed(1)}M</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Their Entry Price:</span>
+                                    <span class="detail-value">$${insider.price.toFixed(2)}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Current Price:</span>
+                                    <span class="detail-value ${gainClass}">$${insider.currentPrice.toFixed(2)}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span class="detail-label">Their Gain/Loss:</span>
+                                    <span class="detail-value ${gainClass}">
+                                        ${insider.gainPercent >= 0 ? '+' : ''}${insider.gainPercent.toFixed(1)}%
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="confidence-score">
+                                <div class="score-label">Confidence Score:</div>
+                                <div class="score-bar">
+                                    <div class="score-fill" style="width: ${insider.confidence}%"></div>
+                                </div>
+                                <div class="score-value">${insider.confidence}/100</div>
+                            </div>
+                            
+                            <div class="insider-stats">
+                                <div class="stat-box">
+                                    <div class="stat-label">Historical Win Rate</div>
+                                    <div class="stat-value">${insider.winRate}%</div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-label">Avg Return</div>
+                                    <div class="stat-value ${insider.avgReturn >= 0 ? 'profit-positive' : 'profit-negative'}">
+                                        ${insider.avgReturn >= 0 ? '+' : ''}${insider.avgReturn}%
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="why-follow">
+                                <div class="why-title">💡 Why Follow This Trade:</div>
+                                <div style="color: var(--text-gray); line-height: 1.8;">${insider.why}</div>
+                            </div>
+                            
+                            <div class="tip-box ${actionClass === 'buy' ? 'success' : 'danger'}">
+                                <div class="tip-title">🎯 Trading Strategy:</div>
+                                <ul style="margin: 10px 0 0 20px; color: var(--text-gray); line-height: 2;">
+                                    ${insider.strategy.map(s => `<li>${s}</li>`).join('')}
+                                </ul>
+                            </div>
+                            
+                            <div class="action-buttons">
+                                <button class="btn btn-primary btn-small" onclick="alert('Open ${insider.ticker} on your broker')">
+                                    Trade on Robinhood
+                                </button>
+                                <button class="btn btn-secondary btn-small" onclick="alert('Opening ${insider.ticker} in Think or Swim')">
+                                    Analyze in ToS
+                                </button>
+                                <button class="btn btn-secondary btn-small" onclick="alert('Alert set for ${insider.ticker}')">
+                                    Set Price Alert
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                resultsDiv.innerHTML = html;
+            }, 1500);
+        }
+
+        // STOCK PREDICTION FUNCTIONS
+        function predictStock() {
+            const symbol = document.getElementById('stockSymbol').value.toUpperCase();
+            if (!symbol) {
+                alert('Please enter a stock symbol');
+                return;
+            }
+            
+            const resultsDiv = document.getElementById('predictionResults');
+            resultsDiv.innerHTML = '<div class="loading"><div class="spinner"></div>Analyzing ' + symbol + '...</div>';
+            
+            setTimeout(() => {
+                const predictions = {
+                    'TSLA': {
+                        symbol: 'TSLA',
+                        company: 'Tesla Inc.',
+                        currentPrice: 242.84,
+                        prediction: 'BULLISH',
+                        targetPrice: 350,
+                        probability: 78,
+                        timeframe: '3-6 months',
+                        catalysts: ['Cybertruck Production', 'FSD Beta Release', 'Energy Storage Growth'],
+                        strategy: 'Buy calls 6 months out, $280-300 strike'
+                    },
+                    'NVDA': {
+                        symbol: 'NVDA',
+                        company: 'NVIDIA Corporation',
+                        currentPrice: 505.48,
+                        prediction: 'VERY BULLISH',
+                        targetPrice: 650,
+                        probability: 85,
+                        timeframe: '6-12 months',
+                        catalysts: ['AI Chip Demand', 'Data Center Growth', 'Gaming Recovery'],
+                        strategy: 'Buy shares or long-dated calls, $550+ strikes'
+                    },
+                    'AAPL': {
+                        symbol: 'AAPL',
+                        company: 'Apple Inc.',
+                        currentPrice: 178.25,
+                        prediction: 'BULLISH',
+                        targetPrice: 220,
+                        probability: 72,
+                        timeframe: '12-18 months',
+                        catalysts: ['iPhone 16 Cycle', 'Services Growth', 'Vision Pro Adoption'],
+                        strategy: 'Accumulate shares on dips, sell covered calls'
+                    }
+                };
+                
+                const stock = predictions[symbol] || {
+                    symbol: symbol,
+                    company: symbol + ' Corporation',
+                    currentPrice: Math.random() * 100 + 50,
+                    prediction: Math.random() > 0.5 ? 'BULLISH' : 'BEARISH',
+                    targetPrice: Math.random() * 200 + 100,
+                    probability: Math.floor(Math.random() * 40) + 60,
+                    timeframe: '3-6 months',
+                    catalysts: ['Earnings Beat', 'New Product Launch', 'Market Expansion'],
+                    strategy: 'Monitor for entry opportunity'
+                };
+                
+                const upside = ((stock.targetPrice - stock.currentPrice) / stock.currentPrice * 100).toFixed(1);
+                const predictionClass = stock.prediction.includes('BULLISH') ? 'profit-positive' : 'profit-negative';
+                
+                resultsDiv.innerHTML = `
+                    <div class="stock-result">
+                        <div class="stock-header">
+                            <div>
+                                <div class="stock-symbol">${stock.symbol}</div>
+                                <div style="color: var(--text-gray); font-size: 0.9rem;">${stock.company}</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div class="stock-price ${predictionClass}">$${stock.currentPrice.toFixed(2)}</div>
+                                <div class="price-change ${predictionClass}">Target: $${stock.targetPrice.toFixed(2)}</div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin: 20px 0;">
+                            <div style="font-size: 1.2rem; font-weight: 700; color: var(--primary-yellow); margin-bottom: 10px;">
+                                Prediction: <span class="${predictionClass}">${stock.prediction}</span>
+                            </div>
+                            <div style="color: var(--text-gray);">
+                                Timeframe: ${stock.timeframe} | Upside: <span class="${predictionClass}">+${upside}%</span>
+                            </div>
+                        </div>
+                        
+                        <div class="probability-meter">
+                            <span style="color: var(--text-gray); font-size: 0.9rem;">Success Probability:</span>
+                            <div class="probability-bar">
+                                <div class="probability-fill" style="width: ${stock.probability}%"></div>
+                            </div>
+                            <span style="font-weight: 700; color: var(--primary-green);">${stock.probability}%</span>
+                        </div>
+                        
+                        <div style="margin: 20px 0;">
+                            <div style="font-weight: 700; color: var(--primary-yellow); margin-bottom: 10px;">Key Catalysts:</div>
+                            <div>
+                                ${stock.catalysts.map(catalyst => `<span class="catalyst-tag">${catalyst}</span>`).join('')}
+                            </div>
+                        </div>
+                        
+                        <div class="tip-box success">
+                            <div class="tip-title">🎯 Trading Strategy:</div>
+                            <div style="color: var(--text-gray);">${stock.strategy}</div>
+                        </div>
+                    </div>
+                `;
+            }, 2000);
+        }
+
+        // CATALYST SCANNER
+        function scanCatalysts() {
+            const resultsDiv = document.getElementById('catalystResults');
+            resultsDiv.innerHTML = '<div class="loading"><div class="spinner"></div>Scanning for active catalysts...</div>';
+            
+            setTimeout(() => {
+                const catalysts = [
+                    {
+                        ticker: 'MRNA',
+                        company: 'Moderna Inc.',
+                        catalyst: 'FDA Approval Decision',
+                        date: 'Nov 15, 2024',
+                        probability: 82,
+                        impact: 'HIGH',
+                        description: 'RSV vaccine approval decision expected. Historical FDA approvals move biotech stocks 20-50%.'
+                    },
+                    {
+                        ticker: 'PLTR',
+                        company: 'Palantir Technologies',
+                        catalyst: 'Government Contract',
+                        date: 'Nov 8, 2024',
+                        probability: 75,
+                        impact: 'MEDIUM',
+                        description: 'Pentagon AI contract announcement expected. Defense contracts typically boost stock 10-25%.'
+                    },
+                    {
+                        ticker: 'COIN',
+                        company: 'Coinbase',
+                        catalyst: 'Bitcoin ETF Decision',
+                        date: 'Nov 12, 2024',
+                        probability: 68,
+                        impact: 'HIGH',
+                        description: 'SEC decision on Bitcoin ETF applications. Approval could drive crypto stocks up 30-60%.'
+                    }
+                ];
+                
+                let html = '';
+                catalysts.forEach(catalyst => {
+                    const impactClass = catalyst.impact === 'HIGH' ? 'profit-positive' : 'profit-negative';
+                    
+                    html += `
+                        <div class="stock-result">
+                            <div class="stock-header">
+                                <div>
+                                    <div class="stock-symbol">${catalyst.ticker}</div>
+                                    <div style="color: var(--text-gray); font-size: 0.9rem;">${catalyst.company}</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div class="catalyst-tag ${impactClass}">${catalyst.impact} IMPACT</div>
+                                </div>
+                            </div>
+                            
+                            <div style="margin: 20px 0;">
+                                <div style="font-size: 1.2rem; font-weight: 700; color: var(--primary-yellow); margin-bottom: 5px;">
+                                    ${catalyst.catalyst}
+                                </div>
+                                <div style="color: var(--text-gray);">Expected: ${catalyst.date}</div>
+                            </div>
+                            
+                            <div class="probability-meter">
+                                <span style="color: var(--text-gray); font-size: 0.9rem;">Success Probability:</span>
+                                <div class="probability-bar">
+                                    <div class="probability-fill" style="width: ${catalyst.probability}%"></div>
+                                </div>
+                                <span style="font-weight: 700; color: var(--primary-green);">${catalyst.probability}%</span>
+                            </div>
+                            
+                            <div class="tip-box">
+                                <div class="tip-title">📊 Analysis:</div>
+                                <div style="color: var(--text-gray);">${catalyst.description}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                resultsDiv.innerHTML = html;
+            }, 1800);
+        }
+
+        // PENNY STOCK SCANNER
+        function scanPennyStocks() {
+            const resultsDiv = document.getElementById('pennyResults');
+            resultsDiv.innerHTML = '<div class="loading"><div class="spinner"></div>Scanning penny stocks...</div>';
+            
+            setTimeout(() => {
+                const pennyStocks = [
+                    {
+                        ticker: 'SNDL',
+                        company: 'Sundial Growers',
+                        price: 2.45,
+                        volume: '15.2M',
+                        change: '+12.5%',
+                        catalyst: 'Cannabis Legalization News',
+                        probability: 65
+                    },
+                    {
+                        ticker: 'BBIG',
+                        company: 'Vinco Ventures',
+                        price: 1.85,
+                        volume: '8.7M',
+                        change: '+8.2%',
+                        catalyst: 'Merger Announcement',
+                        probability: 58
+                    },
+                    {
+                        ticker: 'PROG',
+                        company: 'Progenity Inc.',
+                        price: 3.12,
+                        volume: '12.1M',
+                        change: '+15.7%',
+                        catalyst: 'Biotech Partnership',
+                        probability: 72
+                    }
+                ];
+                
+                let html = '';
+                pennyStocks.forEach(stock => {
+                    html += `
+                        <div class="stock-result">
+                            <div class="stock-header">
+                                <div>
+                                    <div class="stock-symbol">${stock.ticker}</div>
+                                    <div style="color: var(--text-gray); font-size: 0.9rem;">${stock.company}</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div class="stock-price profit-positive">$${stock.price}</div>
+                                    <div class="price-change profit-positive">${stock.change}</div>
+                                </div>
+                            </div>
+                            
+                            <div style="margin: 15px 0;">
+                                <div style="color: var(--text-gray); margin-bottom: 10px;">
+                                    Volume: ${stock.volume} | Catalyst: ${stock.catalyst}
+                                </div>
+                            </div>
+                            
+                            <div class="probability-meter">
+                                <span style="color: var(--text-gray); font-size: 0.9rem;">Profit Probability:</span>
+                                <div class="probability-bar">
+                                    <div class="probability-fill" style="width: ${stock.probability}%"></div>
+                                </div>
+                                <span style="font-weight: 700; color: var(--primary-green);">${stock.probability}%</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                resultsDiv.innerHTML = html;
+            }, 2200);
+        }
+
+        // OTC SCANNER
+        function scanOTC() {
+            const resultsDiv = document.getElementById('otcResults');
+            resultsDiv.innerHTML = '<div class="loading"><div class="spinner"></div>Scanning OTC markets...</div>';
+            
+            setTimeout(() => {
+                const otcStocks = [
+                    {
+                        ticker: 'HEMP',
+                        company: 'Hemp Inc.',
+                        price: 0.0045,
+                        tier: 'OTCQB',
+                        change: '+25.0%',
+                        catalyst: 'Uplist Application',
+                        probability: 45
+                    },
+                    {
+                        ticker: 'MINE',
+                        company: 'Minerco Inc.',
+                        price: 0.0012,
+                        tier: 'Pink Sheets',
+                        change: '+50.0%',
+                        catalyst: 'Mining Rights Acquired',
+                        probability: 35
+                    }
+                ];
+                
+                let html = '';
+                otcStocks.forEach(stock => {
+                    html += `
+                        <div class="stock-result">
+                            <div class="stock-header">
+                                <div>
+                                    <div class="stock-symbol">${stock.ticker}</div>
+                                    <div style="color: var(--text-gray); font-size: 0.9rem;">${stock.company}</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div class="stock-price profit-positive">$${stock.price}</div>
+                                    <div class="price-change profit-positive">${stock.change}</div>
+                                </div>
+                            </div>
+                            
+                            <div style="margin: 15px 0;">
+                                <span class="catalyst-tag">${stock.tier}</span>
+                                <span class="catalyst-tag">${stock.catalyst}</span>
+                            </div>
+                            
+                            <div class="probability-meter">
+                                <span style="color: var(--text-gray); font-size: 0.9rem;">Success Rate:</span>
+                                <div class="probability-bar">
+                                    <div class="probability-fill" style="width: ${stock.probability}%"></div>
+                                </div>
+                                <span style="font-weight: 700; color: var(--primary-green);">${stock.probability}%</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                resultsDiv.innerHTML = html;
+            }, 2500);
+        }
+
+        // TAKE PROFIT CALCULATOR
+        function calculateProfits() {
+            const entryPrice = parseFloat(document.getElementById('entryPrice').value);
+            const numContracts = parseInt(document.getElementById('numContracts').value);
+            
+            if (!entryPrice || !numContracts) {
+                alert('Please enter entry price and number of contracts');
+                return;
+            }
+            
+            const totalInvestment = entryPrice * numContracts * 100;
+            
+            const targets = [
+                { percent: 25, sellPercent: 0.25, emoji: '🎯' },
+                { percent: 50, sellPercent: 0.30, emoji: '💰' },
+                { percent: 
+100, sellPercent: 0.25, emoji: '🚀' },
+                { percent: 200, sellPercent: 0.20, emoji: '💎' }
+            ];
+            
+            let totalProfit = 0;
+            let html = '';
+            
+            targets.forEach((target, index) => {
+                const targetPrice = entryPrice * (1 + target.percent / 100);
+                const contractsToSell = Math.floor(numContracts * target.sellPercent);
+                const profit = (targetPrice - entryPrice) * contractsToSell * 100;
+                totalProfit += profit;
+                
+                html += `
+                    <div class="result-item">
+                        <div>
+                            <div class="result-label">Target ${index + 1} (${target.percent}% gain) ${target.emoji}</div>
+                            <div class="result-value profit-positive">$${targetPrice.toFixed(2)} per contract</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div class="result-label">Sell ${contractsToSell} contracts (${(target.sellPercent * 100).toFixed(0)}%)</div>
+                            <div class="result-value profit-positive">+$${profit.toLocaleString()}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            // Update summary
+            document.getElementById('totalInvestment').textContent = '$' + totalInvestment.toLocaleString();
+            document.getElementById('totalProfit').textContent = '+$' + totalProfit.toLocaleString();
+            document.getElementById('totalReturn').textContent = '+' + ((totalProfit / totalInvestment) * 100).toFixed(1) + '%';
+            
+            // Update targets
+            document.getElementById('profitTargets').innerHTML = html;
+            
+            // Show results
+            document.getElementById('calculatorResults').style.display = 'block';
+            
+            // Store for clipboard
+            clipboardData = `
+Options Take Profit Plan:
+Entry: $${entryPrice} x ${numContracts} contracts
+Total Investment: $${totalInvestment.toLocaleString()}
+
+Exit Strategy:
+${targets.map((target, index) => {
+    const targetPrice = entryPrice * (1 + target.percent / 100);
+    const contractsToSell = Math.floor(numContracts * target.sellPercent);
+    return `Target ${index + 1}: Sell ${contractsToSell} contracts at $${targetPrice.toFixed(2)} (${target.percent}% gain)`;
+}).join('\n')}
+
+Total Profit if all targets hit: +$${totalProfit.toLocaleString()}
+Total Return: +${((totalProfit / totalInvestment) * 100).toFixed(1)}%
+            `.trim();
+        }
+        
+        function copyToClipboard() {
+            navigator.clipboard.writeText(clipboardData).then(() => {
+                alert('📋 Orders copied to clipboard! Paste into your broker app.');
+            }).catch(() => {
+                alert('Copy failed. Please copy manually from the results above.');
+            });
+        }
+
+        // Real-time update system integration
+        document.addEventListener('DOMContentLoaded', function() {
+            // Listen for real-time update events
+            window.addEventListener('websocketConnected', function(event) {
+                console.log('Real-time updates connected:', event.detail);
+                showConnectionStatus(true);
+            });
+
+            window.addEventListener('priceUpdate', function(event) {
+                const priceData = event.detail;
+                console.log('Price update received:', priceData);
+                // Price updates are handled automatically by the update pipeline
+            });
+
+            window.addEventListener('newsUpdate', function(event) {
+                const newsData = event.detail;
+                console.log('News update received:', newsData);
+                
+                // Show notification for high-impact breaking news
+                if (newsData.isBreaking && newsData.impactScore >= 8) {
+                    showBreakingNewsNotification(newsData);
+                }
+            });
+
+            window.addEventListener('recommendationUpdate', function(event) {
+                const recData = event.detail;
+                console.log('Recommendation update received:', recData);
+                
+                // Refresh the current section if it matches the update
+                const currentSection = getCurrentActiveSection();
+                if (recData.section === currentSection) {
+                    refreshCurrentSection();
+                }
+            });
+
+            window.addEventListener('scheduledUpdateComplete', function(event) {
+                console.log('Scheduled update completed:', event.detail);
+                showUpdateNotification('Recommendations updated with latest market data');
+            });
+
+            window.addEventListener('immediateUpdateComplete', function(event) {
+                const { symbols, reason } = event.detail;
+                console.log('Immediate update completed:', symbols, reason);
+                showUpdateNotification(`Updated recommendations for ${symbols.join(', ')} due to ${reason}`);
+            });
+
+            // Add data attributes to recommendation cards for real-time updates
+            addDataAttributesToRecommendations();
+        });
+
+        // Helper functions for real-time integration
+        function showConnectionStatus(connected) {
+            const statusElement = document.getElementById('connection-status');
+            if (!statusElement) {
+                const status = document.createElement('div');
+                status.id = 'connection-status';
+                status.style.cssText = 'position: fixed; top: 10px; right: 10px; padding: 5px 10px; border-radius: 5px; font-size: 0.8rem; z-index: 1000;';
+                document.body.appendChild(status);
+            }
+            
+            const element = document.getElementById('connection-status');
+            if (connected) {
+                element.textContent = '🟢 Live Updates Active';
+                element.style.background = 'rgba(0, 255, 65, 0.2)';
+                element.style.color = 'var(--primary-green)';
+                element.style.border = '1px solid var(--primary-green)';
+            } else {
+                element.textContent = '🔴 Updates Disconnected';
+                element.style.background = 'rgba(255, 51, 51, 0.2)';
+                element.style.color = 'var(--danger)';
+                element.style.border = '1px solid var(--danger)';
+            }
+        }
+
+        function showBreakingNewsNotification(newsData) {
+            // Create breaking news overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'breaking-news-overlay';
+            overlay.style.cssText = `
+                position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+                background: rgba(0, 0, 0, 0.8); z-index: 10000; 
+                display: flex; align-items: center; justify-content: center;
+            `;
+            
+            overlay.innerHTML = `
+                <div style="background: var(--card-black); border: 3px solid var(--danger); border-radius: 15px; padding: 30px; max-width: 600px; text-align: center;">
+                    <div style="font-size: 2rem; margin-bottom: 20px;">🚨 BREAKING NEWS ALERT</div>
+                    <div style="font-size: 1.3rem; font-weight: 700; color: var(--primary-yellow); margin-bottom: 15px;">${newsData.headline}</div>
+                    <div style="color: var(--text-gray); margin-bottom: 20px;">Impact Score: ${newsData.impactScore}/10 | Affected: ${newsData.affectedSymbols.join(', ')}</div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="btn btn-primary">View Updated Recommendations</button>
+                </div>
+            `;
+            
+            document.body.appendChild(overlay);
+            
+            // Auto-remove after 10 seconds
+            setTimeout(() => {
+                if (overlay.parentNode) {
+                    overlay.parentNode.removeChild(overlay);
+                }
+            }, 10000);
+        }
+
+        function showUpdateNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'update-notification';
+            notification.style.cssText = `
+                position: fixed; bottom: 20px; right: 20px; 
+                background: var(--card-black); border: 2px solid var(--primary-green); 
+                border-radius: 10px; padding: 15px; max-width: 300px; z-index: 1000;
+                box-shadow: 0 4px 15px rgba(0, 255, 65, 0.3);
+            `;
+            
+            notification.innerHTML = `
+                <div style="font-weight: 700; color: var(--primary-green); margin-bottom: 5px;">📊 Update Complete</div>
+                <div style="color: var(--text-white); font-size: 0.9rem;">${message}</div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 3 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 3000);
+        }
+
+        function getCurrentActiveSection() {
+            const activeTab = document.querySelector('.tab.active');
+            if (!activeTab) return null;
+            
+            // Extract section name from onclick attribute
+            const onclick = activeTab.getAttribute('onclick');
+            const match = onclick.match(/showTab\('([^']+)'\)/);
+            return match ? match[1] : null;
+        }
+
+        function refreshCurrentSection() {
+            const currentSection = getCurrentActiveSection();
+            if (!currentSection) return;
+            
+            // Call the appropriate scan function based on current section
+            switch(currentSection) {
+                case 'insiders':
+                    scanInsiders();
+                    break;
+                case 'predictions':
+                    // Don't auto-refresh predictions as they require user input
+                    break;
+                case 'news':
+                    scanCatalysts();
+                    break;
+                case 'news-analysis':
+                    if (typeof scanNewsAnalysis === 'function') {
+                        scanNewsAnalysis();
+                    }
+                    break;
+                case 'catalyst-events':
+                    if (typeof scanCatalystEvents === 'function') {
+                        scanCatalystEvents();
+                    }
+                    break;
+                case 'politicians-big-investors':
+                    if (typeof scanPoliticiansInvestors === 'function') {
+                        scanPoliticiansInvestors();
+                    }
+                    break;
+                case 'catalyst-scanner':
+                    if (typeof scanCatalystOpportunities === 'function') {
+                        scanCatalystOpportunities();
+                    }
+                    break;
+                case 'biotech-analyzer':
+                    if (typeof scanBiotechBreakthroughs === 'function') {
+                        scanBiotechBreakthroughs();
+                    }
+                    break;
+                case 'growth-stocks':
+                    if (typeof scanGrowthStocks === 'function') {
+                        scanGrowthStocks();
+                    }
+                    break;
+                case 'options-recommendations':
+                    if (typeof scanOptionsRecommendations === 'function') {
+                        scanOptionsRecommendations();
+                    }
+                    break;
+                case 'crypto-infrastructure':
+                    if (typeof scanCryptoInfrastructure === 'function') {
+                        scanCryptoInfrastructure();
+                    }
+                    break;
+                case 'forex-analyzer':
+                    if (typeof scanForexOpportunities === 'function') {
+                        scanForexOpportunities();
+                    }
+                    break;
+                case 'short-squeeze':
+                    if (typeof scanShortSqueezeOpportunities === 'function') {
+                        scanShortSqueezeOpportunities();
+                    }
+                    break;
+                case 'ipo-analyzer':
+                    if (typeof scanIPOOpportunities === 'function') {
+                        scanIPOOpportunities();
+                    }
+                    break;
+                case 'mergers-acquisitions':
+                    if (typeof scanMergerArbitrage === 'function') {
+                        scanMergerArbitrage();
+                    }
+                    break;
+                case 'community-forum':
+                    if (typeof refreshForumPosts === 'function') {
+                        refreshForumPosts();
+                    }
+                    break;
+            }
+        }
+
+        function addDataAttributesToRecommendations() {
+            // Add data attributes to recommendation cards for real-time updates
+            setTimeout(() => {
+                const stockResults = document.querySelectorAll('.stock-result, .insider-card');
+                stockResults.forEach(card => {
+                    const symbolElement = card.querySelector('.stock-symbol, .insider-name');
+                    if (symbolElement) {
+                        const symbol = symbolElement.textContent.trim();
+                        if (symbol && symbol.length <= 5 && /^[A-Z]+$/.test(symbol)) {
+                            card.setAttribute('data-symbol', symbol);
+                        }
+                    }
+                });
+            }, 1000);
+        }
+
+        // Initialize real-time updates when page loads
+        window.addEventListener('load', function() {
+            // Add connection status indicator
+            showConnectionStatus(false);
+            
+            // The RecommendationUpdatePipeline will be initialized by real-time-updates.js
+            console.log('Trading Scanner Pro loaded with real-time update support');
+        });
+    </script>
+</body>
+</html>

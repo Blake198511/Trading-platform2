@@ -1,0 +1,667 @@
+/* Universal Recommendation Card System */
+
+/* Base Recommendation Card */
+.recommendation-card {
+    background: var(--card-black);
+    border: 2px solid var(--border-color);
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.recommendation-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+}
+
+/* Asset Type Color Coding */
+.recommendation-card.stock::before {
+    background: linear-gradient(90deg, #3B82F6, #60A5FA);
+}
+
+.recommendation-card.option::before {
+    background: linear-gradient(90deg, #8B5CF6, #A78BFA);
+}
+
+.recommendation-card.crypto::before {
+    background: linear-gradient(90deg, #F59E0B, #FBBF24);
+}
+
+.recommendation-card.forex::before {
+    background: linear-gradient(90deg, #10B981, #34D399);
+}
+
+.recommendation-card:hover {
+    border-color: var(--primary-yellow);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(255, 215, 0, 0.2);
+}
+
+/* Card Header */
+.rec-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 20px;
+}
+
+.rec-symbol-section {
+    flex: 1;
+}
+
+.rec-symbol {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--primary-yellow);
+    margin-bottom: 5px;
+}
+
+.rec-company-name {
+    color: var(--text-gray);
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+}
+
+.rec-asset-type {
+    display: inline-block;
+    padding: 4px 12px;
+    background: rgba(255, 215, 0, 0.15);
+    border: 1px solid var(--primary-yellow);
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.rec-action-badge {
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-weight: 800;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.rec-action-badge.buy {
+    background: rgba(0, 255, 65, 0.2);
+    color: var(--primary-green);
+    border: 2px solid var(--primary-green);
+}
+
+.rec-action-badge.sell {
+    background: rgba(255, 51, 51, 0.2);
+    color: var(--danger);
+    border: 2px solid var(--danger);
+}
+
+/* Pricing Section */
+.rec-pricing {
+    background: var(--bg-black);
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+}
+
+.rec-pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 15px;
+}
+
+.rec-price-item {
+    text-align: center;
+    padding: 12px;
+    background: var(--card-black);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.rec-price-label {
+    color: var(--text-gray);
+    font-size: 0.8rem;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.rec-price-value {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--primary-yellow);
+}
+
+.rec-price-value.entry {
+    color: var(--text-white);
+}
+
+.rec-price-value.target {
+    color: var(--primary-green);
+}
+
+.rec-price-value.stop-loss {
+    color: var(--danger);
+}
+
+/* Profit Targets Section */
+.rec-profit-targets {
+    margin: 20px 0;
+}
+
+.rec-section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary-yellow);
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.profit-target-item {
+    background: var(--bg-black);
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    border-left: 4px solid var(--primary-green);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.profit-target-item:hover {
+    border-left-color: var(--primary-yellow);
+    transform: translateX(5px);
+}
+
+.profit-target-info {
+    flex: 1;
+}
+
+.profit-target-label {
+    font-weight: 700;
+    color: var(--text-white);
+    margin-bottom: 4px;
+}
+
+.profit-target-price {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--primary-green);
+}
+
+.profit-target-allocation {
+    text-align: right;
+}
+
+.allocation-percent {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--primary-yellow);
+}
+
+.allocation-label {
+    color: var(--text-gray);
+    font-size: 0.85rem;
+}
+
+/* Risk & Confidence Section */
+.rec-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.rec-metric-box {
+    background: var(--bg-black);
+    padding: 15px;
+    border-radius: 10px;
+    border: 2px solid var(--border-color);
+}
+
+.rec-metric-label {
+    color: var(--text-gray);
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.rec-metric-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+}
+
+/* Confidence Score */
+.confidence-display {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.confidence-bar {
+    flex: 1;
+    height: 10px;
+    background: var(--border-color);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.confidence-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-green), var(--primary-yellow));
+    transition: width 0.5s ease;
+}
+
+.confidence-number {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--primary-green);
+}
+
+/* Risk Level Badges */
+.risk-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+.risk-badge.low {
+    background: rgba(0, 255, 65, 0.2);
+    color: var(--primary-green);
+    border: 2px solid var(--primary-green);
+}
+
+.risk-badge.medium {
+    background: rgba(255, 215, 0, 0.2);
+    color: var(--primary-yellow);
+    border: 2px solid var(--primary-yellow);
+}
+
+.risk-badge.high {
+    background: rgba(255, 51, 51, 0.2);
+    color: var(--danger);
+    border: 2px solid var(--danger);
+}
+
+/* Risk-Reward Ratio */
+.risk-reward-display {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--primary-green);
+}
+
+/* Timeframe Display */
+.timeframe-display {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-white);
+}
+
+/* Position Sizing */
+.position-sizing {
+    background: rgba(255, 215, 0, 0.1);
+    border: 1px solid var(--primary-yellow);
+    border-radius: 10px;
+    padding: 15px;
+    margin: 20px 0;
+}
+
+.position-size-value {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--primary-yellow);
+}
+
+.position-size-note {
+    color: var(--text-gray);
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+
+/* Catalyst Section */
+.rec-catalyst {
+    background: rgba(0, 255, 65, 0.05);
+    border-left: 4px solid var(--primary-green);
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+.catalyst-title {
+    font-weight: 700;
+    color: var(--primary-green);
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.catalyst-description {
+    color: var(--text-white);
+    line-height: 1.6;
+}
+
+/* Reasoning Section */
+.rec-reasoning {
+    margin: 20px 0;
+}
+
+.reasoning-list {
+    list-style: none;
+    padding: 0;
+}
+
+.reasoning-item {
+    background: var(--bg-black);
+    padding: 12px 15px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    border-left: 3px solid var(--primary-yellow);
+    color: var(--text-gray);
+    line-height: 1.6;
+    position: relative;
+    padding-left: 35px;
+}
+
+.reasoning-item::before {
+    content: '✓';
+    position: absolute;
+    left: 12px;
+    color: var(--primary-green);
+    font-weight: 800;
+    font-size: 1.1rem;
+}
+
+/* Entry/Exit Strategy */
+.rec-strategy {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(0, 255, 65, 0.1));
+    border: 2px solid var(--primary-green);
+    border-radius: 15px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.strategy-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--primary-yellow);
+    margin-bottom: 15px;
+}
+
+.strategy-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.strategy-item {
+    background: var(--bg-black);
+    padding: 15px;
+    border-radius: 8px;
+}
+
+.strategy-item-label {
+    color: var(--text-gray);
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+}
+
+.strategy-item-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-white);
+}
+
+/* Action Buttons */
+.rec-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+}
+
+.rec-btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.rec-btn-primary {
+    background: linear-gradient(135deg, var(--primary-yellow), var(--dark-green));
+    color: var(--bg-black);
+}
+
+.rec-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+}
+
+.rec-btn-secondary {
+    background: var(--bg-black);
+    color: var(--primary-green);
+    border: 2px solid var(--primary-green);
+}
+
+.rec-btn-secondary:hover {
+    background: var(--primary-green);
+    color: var(--bg-black);
+}
+
+/* Options-Specific Styles */
+.options-details {
+    background: var(--bg-black);
+    padding: 15px;
+    border-radius: 10px;
+    margin: 15px 0;
+}
+
+.options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px;
+}
+
+.option-detail {
+    text-align: center;
+    padding: 10px;
+    background: var(--card-black);
+    border-radius: 8px;
+}
+
+.option-detail-label {
+    color: var(--text-gray);
+    font-size: 0.75rem;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+
+.option-detail-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary-yellow);
+}
+
+/* Greeks Display */
+.greeks-display {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin: 15px 0;
+}
+
+.greek-item {
+    background: var(--bg-black);
+    padding: 10px 15px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.greek-label {
+    color: var(--text-gray);
+    font-size: 0.75rem;
+    margin-bottom: 4px;
+}
+
+.greek-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--primary-green);
+}
+
+/* Crypto-Specific Styles */
+.crypto-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin: 15px 0;
+}
+
+.crypto-metric {
+    background: var(--bg-black);
+    padding: 12px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.crypto-metric-label {
+    color: var(--text-gray);
+    font-size: 0.8rem;
+    margin-bottom: 6px;
+}
+
+.crypto-metric-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--primary-yellow);
+}
+
+/* Forex-Specific Styles */
+.forex-pair {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--primary-yellow);
+    margin-bottom: 10px;
+}
+
+.economic-events {
+    margin: 15px 0;
+}
+
+.economic-event {
+    background: var(--bg-black);
+    padding: 12px 15px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    border-left: 3px solid var(--primary-yellow);
+}
+
+.event-impact {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-left: 10px;
+}
+
+.event-impact.high {
+    background: rgba(255, 51, 51, 0.2);
+    color: var(--danger);
+}
+
+.event-impact.medium {
+    background: rgba(255, 215, 0, 0.2);
+    color: var(--primary-yellow);
+}
+
+.event-impact.low {
+    background: rgba(0, 255, 65, 0.2);
+    color: var(--primary-green);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .rec-header {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .rec-action-badge {
+        align-self: flex-start;
+    }
+    
+    .rec-pricing-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .rec-metrics {
+        grid-template-columns: 1fr;
+    }
+    
+    .strategy-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .rec-actions {
+        flex-direction: column;
+    }
+    
+    .rec-btn {
+        width: 100%;
+    }
+}
+
+/* Loading State */
+.rec-card-loading {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-gray);
+}
+
+.rec-spinner {
+    border: 3px solid var(--border-color);
+    border-top: 3px solid var(--primary-yellow);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+/* Empty State */
+.rec-empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-gray);
+}
+
+.rec-empty-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.rec-empty-message {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
