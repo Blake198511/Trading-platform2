@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MarketMaster Pro Trading Platform</title>
+    
+    <!-- Environment Configuration via Meta Tags (Optional) -->
+    <!-- Uncomment and customize these for your deployment -->
+    <!--
+    <meta name="env:API_ENDPOINT" content="https://api.example.com">
+    <meta name="env:API_KEY" content="your_api_key_here">
+    <meta name="env:DEFAULT_CURRENCY" content="USD">
+    <meta name="env:DEFAULT_THEME" content="dark">
+    <meta name="env:ENABLE_CRYPTO" content="true">
+    <meta name="env:ENABLE_LIVE_TRADING" content="false">
+    -->
+    
+    <!-- Load Configuration System -->
+    <script src="env-loader.js"></script>
+    <script src="config.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .config-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+        
+        .config-panel h2 {
+            color: #ffd700;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+        
+        .config-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 3px solid #667eea;
+        }
+        
+        .config-item label {
+            display: block;
+            color: #ffd700;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .config-item .value {
+            color: #a0a0a0;
+            font-family: 'Courier New', monospace;
+            word-break: break-all;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .status.success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .status.warning {
+            background: #ffc107;
+            color: #000;
+        }
+        
+        .status.error {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .feature-card.enabled {
+            border-color: #28a745;
+        }
+        
+        .feature-card.disabled {
+            border-color: #dc3545;
+            opacity: 0.6;
+        }
+        
+        .feature-card h3 {
+            margin-bottom: 10px;
+            color: #ffd700;
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+        
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin: 5px;
+        }
+        
+        button:hover {
+            background: #764ba2;
+        }
+        
+        button.secondary {
+            background: #6c757d;
+        }
+        
+        button.secondary:hover {
+            background: #5a6268;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        
+        .alert.info {
+            background: rgba(23, 162, 184, 0.2);
+            border-left: 4px solid #17a2b8;
+        }
+        
+        .alert.warning {
+            background: rgba(255, 193, 7, 0.2);
+            border-left: 4px solid #ffc107;
+            color: #ffc107;
+        }
+        
+        .actions {
+            margin: 30px 0;
+            text-align: center;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 50px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #a0a0a0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1 id="appName">MarketMaster Pro Trading Platform</h1>
+            <p id="appVersion">Version 1.0.0</p>
+            <p>
+                Environment: <span id="environment" class="status">Loading...</span>
+            </p>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="alert info">
+            <strong>🎉 Configuration System Ready!</strong><br>
+            This platform is now configured to work with environment variables across all browsers and platforms.
+            Check the configuration details below.
+        </div>
+        
+        <div id="validationWarnings"></div>
+        
+        <div class="config-panel">
+            <h2>🔧 Platform Configuration</h2>
+            
+            <div class="config-item">
+                <label>API Endpoint:</label>
+                <div class="value" id="apiEndpoint">Loading...</div>
+            </div>
+            
+            <div class="config-item">
+                <label>API Key:</label>
+                <div class="value" id="apiKey">Loading...</div>
+            </div>
+            
+            <div class="config-item">
+                <label>Default Currency:</label>
+                <div class="value" id="defaultCurrency">Loading...</div>
+            </div>
+            
+            <div class="config-item">
+                <label>Default Market:</label>
+                <div class="value" id="defaultMarket">Loading...</div>
+            </div>
+            
+            <div class="config-item">
+                <label>Live Trading:</label>
+                <div class="value" id="liveTradingStatus">Loading...</div>
+            </div>
+            
+            <div class="config-item">
+                <label>Default Theme:</label>
+                <div class="value" id="defaultTheme">Loading...</div>
+            </div>
+        </div>
+        
+        <div class="config-panel">
+            <h2>✨ Feature Flags</h2>
+            <div class="features-grid" id="featuresGrid">
+                <!-- Features will be loaded here -->
+            </div>
+        </div>
+        
+        <div class="actions">
+            <button onclick="showConfigInConsole()">📋 Show Full Config in Console</button>
+            <button onclick="testConfiguration()" class="secondary">🧪 Test Configuration</button>
+            <button onclick="window.location.href='ENV_SETUP.md'" class="secondary">📖 Setup Guide</button>
+        </div>
+        
+        <div class="config-panel">
+            <h2>🎯 Quick Setup Options</h2>
+            <p style="margin-bottom: 20px;">Choose how you want to configure the platform:</p>
+            
+            <div style="margin: 20px 0;">
+                <h3 style="color: #ffd700; margin-bottom: 10px;">Option 1: Using localStorage</h3>
+                <button onclick="setupWithLocalStorage()">⚙️ Configure with localStorage</button>
+                <button onclick="EnvLoader.clearLocalStorage(); location.reload();" class="secondary">🗑️ Clear localStorage Config</button>
+            </div>
+            
+            <div style="margin: 20px 0;">
+                <h3 style="color: #ffd700; margin-bottom: 10px;">Option 2: Using Meta Tags</h3>
+                <p style="color: #a0a0a0;">Edit the HTML file and uncomment the meta tags in the &lt;head&gt; section</p>
+            </div>
+            
+            <div style="margin: 20px 0;">
+                <h3 style="color: #ffd700; margin-bottom: 10px;">Option 3: Edit config.js Directly</h3>
+                <p style="color: #a0a0a0;">Open config.js and modify the default values</p>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>MarketMaster Pro Trading Platform - Configured for all browsers and platforms</p>
+            <p style="margin-top: 10px; font-size: 0.9rem;">
+                Featuring legendary investors: Warren Buffett, Cathie Wood, George Soros, and more!
+            </p>
+        </div>
+    </footer>
+    
+    <script>
+        // Initialize the page with configuration
+        document.addEventListener('DOMContentLoaded', function() {
+            loadConfiguration();
+        });
+        
+        function loadConfiguration() {
+            const config = window.TradingPlatformConfig;
+            
+            // Update header
+            document.getElementById('appName').textContent = config.platform.name;
+            document.getElementById('appVersion').textContent = 'Version ' + config.platform.version;
+            
+            // Update environment status
+            const envElement = document.getElementById('environment');
+            envElement.textContent = config.platform.environment.toUpperCase();
+            envElement.className = 'status ' + (config.isProduction() ? 'error' : 'success');
+            
+            // Update configuration values
+            document.getElementById('apiEndpoint').textContent = config.api.endpoint || 'Not configured';
+            document.getElementById('apiKey').textContent = config.api.key ? '•••••••••• (Hidden)' : 'Not configured';
+            document.getElementById('defaultCurrency').textContent = config.trading.defaultCurrency;
+            document.getElementById('defaultMarket').textContent = config.trading.defaultMarket;
+            document.getElementById('liveTradingStatus').textContent = config.trading.enableLiveTrading ? 'Enabled ⚠️' : 'Disabled (Safe Mode)';
+            document.getElementById('defaultTheme').textContent = config.display.defaultTheme;
+            
+            // Load features
+            loadFeatures();
+            
+            // Show validation warnings if any
+            showValidationWarnings();
+        }
+        
+        function loadFeatures() {
+            const features = window.TradingPlatformConfig.features;
+            const grid = document.getElementById('featuresGrid');
+            
+            const featureIcons = {
+                crypto: '₿',
+                forex: '💱',
+                stocks: '📈',
+                commodities: '🛢️'
+            };
+            
+            const featureNames = {
+                crypto: 'Cryptocurrency',
+                forex: 'Forex Trading',
+                stocks: 'Stock Market',
+                commodities: 'Commodities'
+            };
+            
+            grid.innerHTML = '';
+            
+            for (const [key, enabled] of Object.entries(features)) {
+                const card = document.createElement('div');
+                card.className = 'feature-card ' + (enabled ? 'enabled' : 'disabled');
+                card.innerHTML = `
+                    <div class="feature-icon">${featureIcons[key] || '📊'}</div>
+                    <h3>${featureNames[key] || key}</h3>
+                    <p>${enabled ? '✅ Enabled' : '❌ Disabled'}</p>
+                `;
+                grid.appendChild(card);
+            }
+        }
+        
+        function showValidationWarnings() {
+            const validation = window.TradingPlatformConfig.validate();
+            const container = document.getElementById('validationWarnings');
+            
+            if (!validation.isValid) {
+                container.innerHTML = `
+                    <div class="alert warning">
+                        <strong>⚠️ Configuration Warnings:</strong><br>
+                        ${validation.errors.map(err => '• ' + err).join('<br>')}
+                    </div>
+                `;
+            }
+        }
+        
+        function showConfigInConsole() {
+            console.log('=== Trading Platform Configuration ===');
+            console.log('Full Config:', window.TradingPlatformConfig);
+            console.log('Environment Variables:', EnvLoader.getEnvironment());
+            console.log('Validation:', window.TradingPlatformConfig.validate());
+            alert('Configuration details logged to console. Press F12 to view.');
+        }
+        
+        function testConfiguration() {
+            console.log('=== Testing Configuration System ===');
+            
+            // Test getter
+            const apiEndpoint = window.TradingPlatformConfig.get('api.endpoint');
+            console.log('✓ Get api.endpoint:', apiEndpoint);
+            
+            // Test with default
+            const unknownValue = window.TradingPlatformConfig.get('unknown.path', 'default_value');
+            console.log('✓ Get with default:', unknownValue);
+            
+            // Test environment checks
+            console.log('✓ Is Production:', window.TradingPlatformConfig.isProduction());
+            console.log('✓ Is Development:', window.TradingPlatformConfig.isDevelopment());
+            
+            // Test validation
+            const validation = window.TradingPlatformConfig.validate();
+            console.log('✓ Validation:', validation);
+            
+            alert('Configuration tests completed! Check console for results.');
+        }
+        
+        function setupWithLocalStorage() {
+            // Example configuration
+            const exampleConfig = {
+                'API_ENDPOINT': 'https://api.example.com',
+                'API_KEY': 'your_api_key_here',
+                'DEFAULT_CURRENCY': 'USD',
+                'DEFAULT_THEME': 'dark',
+                'ENABLE_CRYPTO': 'true',
+                'ENABLE_FOREX': 'true',
+                'ENABLE_STOCKS': 'true',
+                'ENABLE_COMMODITIES': 'true',
+                'ENABLE_LIVE_TRADING': 'false'
+            };
+            
+            if (confirm('This will save example configuration to localStorage. You can edit the values in the code. Continue?')) {
+                EnvLoader.saveToLocalStorage(exampleConfig);
+                alert('Configuration saved! Reloading page to apply changes...');
+                window.location.reload();
+            }
+        }
+    </script>
+</body>
+</html>
